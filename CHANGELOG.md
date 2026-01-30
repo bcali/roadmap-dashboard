@@ -2,6 +2,23 @@
 
 All notable changes to the Roadmap Dashboard project.
 
+## [2.1.0] - 2026-01-30
+
+### 🚀 GitHub Pages Deployment
+
+Added automatic deployment to GitHub Pages for easy sharing.
+
+#### Added
+- **GitHub Actions Workflow** - Automatic deployment on push to `main`
+- **Live URL** - https://bcali.github.io/roadmap-dashboard/
+
+#### Changed
+- Updated `vite.config.ts` with GitHub Pages base path
+- Fixed CSV fetch path to use absolute URL
+- Updated README with deployment instructions
+
+---
+
 ## [2.0.0] - 2026-01-30
 
 ### 🎨 Major UI Redesign - Figma Make Integration

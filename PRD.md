@@ -185,10 +185,11 @@ src/
 - [x] PNG export
 - [x] Toast notifications
 
-### Phase 5: Deploy ⏳
+### Phase 5: Deploy ✅
 - [x] Build for production
-- [ ] Copy to OneDrive folder
-- [ ] Test from OneDrive location
+- [x] GitHub Pages deployment configured
+- [x] GitHub Actions workflow for auto-deploy
+- [x] Live at https://bcali.github.io/roadmap-dashboard/
 
 ---
 
@@ -202,7 +203,7 @@ src/
 - [x] Task modal with editing
 - [x] Export to PNG works
 - [x] No console errors
-- [ ] Deployed to OneDrive and accessible
+- [x] Deployed to GitHub Pages and accessible
 
 ---
 
@@ -222,8 +223,9 @@ Key design elements:
 
 ## Notes
 
-- CSV file and dashboard will live in same OneDrive folder
-- No backend server needed - pure client-side
-- File access works because both files are in same directory
-- Users can edit CSV directly in Excel, refresh browser to see updates
-- TypeScript provides type safety and better developer experience
+- **Deployment:** GitHub Pages at https://bcali.github.io/roadmap-dashboard/
+- **Data Updates:** Edit CSV in GitHub or push locally, auto-deploys in ~2 minutes
+- **Access:** Works on Mac, PC, mobile - no installation needed
+- **Tech:** No backend server needed - pure client-side
+- **Development:** TypeScript provides type safety and better developer experience
+- **CI/CD:** GitHub Actions workflow handles build and deployment automatically
