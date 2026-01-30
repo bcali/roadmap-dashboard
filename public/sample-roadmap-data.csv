@@ -1,31 +1,38 @@
 id,parent_id,level,title,owner,status,start_date,end_date,effort_days,impact,dependency,notes
 PAY-001,,1,Payment Orchestration Platform,Brian,In Progress,1/1/2025,6/30/2025,,High,,Q1-Q2 strategic initiative
-PAY-010,PAY-001,2,Juspay Integration,Brian,In Progress,1/1/2025,2/28/2025,,High,,Core orchestration layer
-PAY-011,PAY-010,3,API Configuration & Credentials,Brian,Complete,1/1/2025,1/10/2025,5,High,,Production keys configured
+PAY-010,PAY-001,2,Juspay Integration,Brian,In Progress,1/1/2025,2/28/2025,,High,,Core orchestration layer; onboarding initiated Jan 27
+PAY-011,PAY-010,3,API Configuration & Credentials,Brian,Complete,1/1/2025,1/10/2025,5,High,,Production keys configured; credential issues resolved Jan 22
 PAY-012,PAY-010,3,Sandbox Testing,Brian,Complete,1/11/2025,1/20/2025,8,High,PAY-011,All test cases passed
 PAY-013,PAY-010,3,Payment Flow Integration,Brian,In Progress,1/21/2025,2/7/2025,10,High,PAY-012,Connecting to PMS
 PAY-014,PAY-010,3,Production Go-Live,Brian,Not Started,2/8/2025,2/15/2025,5,High,PAY-013,Scheduled for Monday
 PAY-015,PAY-010,3,Monitoring & Alerting Setup,Brian,Not Started,2/16/2025,2/28/2025,8,Medium,PAY-014,Datadog integration
+PAY-016,PAY-010,3,Juspay NDA/MSA Processing,Brian,In Progress,1/27/2025,2/14/2025,5,High,,NDA/MSA handling in process per Jan 27 sync
+PAY-017,PAY-010,3,Tokenization Migration Planning,Brian,In Progress,1/27/2025,2/28/2025,8,High,,Migration approach discussed Jan 27 Juspay sync
+PAY-018,PAY-010,3,Airwallex Payout Integration,Brian,Not Started,2/1/2025,3/15/2025,10,High,,Airwallex payout process evaluated Jan 27
 PAY-020,PAY-001,2,Multi-PSP Routing,Brian,Not Started,2/1/2025,4/15/2025,,High,,Worldline + 2C2P + Checkout.com
 PAY-021,PAY-020,3,Worldline Configuration,Brian,In Progress,2/1/2025,2/20/2025,8,High,,APAC primary PSP
 PAY-022,PAY-020,3,2C2P Configuration,Brian,Not Started,2/15/2025,3/10/2025,10,High,,SEA markets
 PAY-023,PAY-020,3,Checkout.com Configuration,Brian,Not Started,3/1/2025,3/20/2025,8,Medium,,Europe/Middle East
 PAY-024,PAY-020,3,Routing Rules Engine,Brian,Not Started,3/15/2025,4/5/2025,12,High,"PAY-021,PAY-022,PAY-023",Cost + success rate optimization
 PAY-025,PAY-020,3,Failover Logic,Brian,Not Started,4/1/2025,4/15/2025,8,High,PAY-024,Automatic PSP fallback
-PAY-030,PAY-001,2,Oracle PMS Integration,Brian,Blocked,1/15/2025,3/31/2025,,High,,Waiting on OHIP confirmation
-PAY-031,PAY-030,3,OHIP API Access,Brian,Blocked,1/15/2025,2/15/2025,5,High,,Pending Oracle legal review
+PAY-030,PAY-001,2,Oracle PMS Integration,Brian,In Progress,1/15/2025,3/31/2025,,High,,OWS preferred for next 2 yrs; Oracle to host (move off Azure); new endpoint needed
+PAY-031,PAY-030,3,OWS Endpoint Migration,Brian,In Progress,1/15/2025,2/15/2025,5,High,,OWS remains; OHIP long-term. Oracle endpoint work required on their side
 PAY-032,PAY-030,3,Payment Posting Integration,Brian,Not Started,2/16/2025,3/15/2025,15,High,PAY-031,Settlement to folio
-PAY-033,PAY-030,3,Tokenization Bridge,Brian,Not Started,3/1/2025,3/31/2025,12,High,PAY-031,Card-on-file sync
+PAY-033,PAY-030,3,Tokenization Bridge,Brian,In Progress,3/1/2025,3/31/2025,12,High,PAY-031,Card-on-file sync; tokenization migration planning underway
 PAY-040,PAY-001,2,Fraud Prevention,Brian,In Progress,1/20/2025,3/15/2025,,High,,Forter integration
 PAY-041,PAY-040,3,Forter SDK Integration,Brian,Complete,1/20/2025,2/5/2025,10,High,,Pre-auth screening
 PAY-042,PAY-040,3,Timeout Configuration,Brian,Complete,2/6/2025,2/10/2025,3,Medium,PAY-041,"2000ms connect, 3000ms read"
 PAY-043,PAY-040,3,Rule Tuning,Brian,In Progress,2/11/2025,3/1/2025,12,High,PAY-042,Balancing fraud vs conversion
 PAY-044,PAY-040,3,Chargeback Integration,Brian,Not Started,3/1/2025,3/15/2025,8,Medium,PAY-043,Dispute management flow
-LOY-001,,1,Loyalty Payment Integration,Brian,Not Started,2/1/2025,5/31/2025,,Medium,,Discovery Dollars as payment method
-LOY-010,LOY-001,2,D$ Payment Method,Brian,Blocked,2/1/2025,4/30/2025,,High,,Requires Oracle multi-tender
+PAY-050,PAY-001,2,Settlement Processing,Brian,In Progress,1/22/2025,3/15/2025,,High,,Identified Jan 22 sync
+PAY-051,PAY-050,3,Settlement Cron Job Setup,Brian,In Progress,1/22/2025,2/7/2025,5,High,,Cron job alignment confirmed Jan 22
+PAY-052,PAY-050,3,Negative Settlement & Carry-Forward Logic,Brian,Not Started,2/1/2025,2/28/2025,8,High,PAY-051,Design decision needed for negative balance handling
+LOY-001,,1,Loyalty Payment Integration,Brian,In Progress,2/1/2025,5/31/2025,,High,,Discovery Dollars as payment method; Loyalty sync held Jan 27
+LOY-010,LOY-001,2,D$ Payment Method,Brian,In Progress,2/1/2025,4/30/2025,,High,,OWS path confirmed; no longer blocked on OHIP
 LOY-011,LOY-010,3,Points Balance API,Brian,Not Started,2/1/2025,2/28/2025,8,High,,Real-time balance check
 LOY-012,LOY-010,3,Points Redemption Flow,Brian,Not Started,3/1/2025,3/31/2025,15,High,LOY-011,Checkout integration
-LOY-013,LOY-010,3,Multi-tender Support,Brian,Blocked,3/15/2025,4/30/2025,12,High,PAY-031,Depends on Oracle OHIP
+LOY-013,LOY-010,3,Multi-tender Support,Brian,In Progress,3/15/2025,4/30/2025,12,High,PAY-031,OWS approach unblocks; Oracle endpoint work needed
+LOY-014,LOY-001,2,Viridian Automation,Brian,Not Started,2/1/2025,3/31/2025,,Medium,,Viridian automation for Opera/GHA workflows; discussed Jan 27
 LOY-020,LOY-001,2,Points Earning,Brian,Not Started,4/1/2025,5/31/2025,,Medium,,Post-stay accrual
 LOY-021,LOY-020,3,Earning Rules Engine,Brian,Not Started,4/1/2025,4/30/2025,10,Medium,,Configurable multipliers
 LOY-022,LOY-020,3,Settlement Integration,Brian,Not Started,5/1/2025,5/31/2025,12,Medium,LOY-021,Batch processing
