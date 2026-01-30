@@ -6,7 +6,9 @@ import { Toaster, toast } from 'sonner';
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, loading, error, lastModified, reload, setData } = useRoadmapData('/sample-roadmap-data.csv');
+  // Use Vite's base URL for correct path in both dev and production
+  const csvPath = `${import.meta.env.BASE_URL}sample-roadmap-data.csv`;
+  const { data, loading, error, lastModified, reload, setData } = useRoadmapData(csvPath);
 
   // Handle export
   const handleExport = async () => {
