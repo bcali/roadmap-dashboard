@@ -51,6 +51,7 @@ export function useRoadmapData(csvPath: string = './sample-roadmap-data.csv'): U
 
       // Convert to swimlane format
       const swimlanes = csvToSwimlanes(result.data);
+      console.log('Swimlanes created:', swimlanes.length, swimlanes.map(s => ({ id: s.id, title: s.title, itemCount: s.items.length })));
       setData(swimlanes);
 
       setLastModified(result.lastModified);

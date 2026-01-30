@@ -6,7 +6,7 @@ import { Toaster, toast } from 'sonner';
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, loading, error, lastModified, reload, setData } = useRoadmapData('./sample-roadmap-data.csv');
+  const { data, loading, error, lastModified, reload, setData } = useRoadmapData('/sample-roadmap-data.csv');
 
   // Handle export
   const handleExport = async () => {
