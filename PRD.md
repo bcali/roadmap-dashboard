@@ -1,8 +1,10 @@
 # Roadmap Visualization Dashboard - PRD & Technical Spec
 
+> **v2.0 Update (2026-01-30):** Major redesign with Figma Make UI - see [CHANGELOG.md](CHANGELOG.md) for details.
+
 ## Overview
 
-Build a browser-based roadmap dashboard that reads from a CSV file on OneDrive and renders an interactive Gantt chart. No backend server required—pure frontend using PapaParse to parse CSV directly in browser.
+Build a browser-based roadmap dashboard that reads from a CSV file on OneDrive and renders an interactive swimlane Gantt chart. No backend server required—pure frontend using PapaParse to parse CSV directly in browser.
 
 ## Problem
 
@@ -53,11 +55,13 @@ The CSV file is the single source of truth with these columns:
 
 ## Technical Stack
 
-- **Framework:** React (single-page app)
-- **Gantt Library:** frappe-gantt (lightweight, MIT license)
-- **CSV Parsing:** PapaParse (fast CSV parser)
-- **Styling:** Tailwind CSS
-- **Build:** Vite
+- **Framework:** React 19 + TypeScript
+- **Gantt Library:** Custom swimlane-based implementation
+- **CSV Parsing:** PapaParse
+- **Styling:** Tailwind CSS 4
+- **UI Components:** Radix UI primitives, Lucide icons
+- **Notifications:** Sonner (toast)
+- **Build:** Vite 7
 - **Export:** html2canvas (PNG export)
 - **Deployment:** OneDrive (static HTML file)
 
@@ -65,54 +69,57 @@ The CSV file is the single source of truth with these columns:
 
 ## Features (Priority Order)
 
-### P0 - MVP (Must Have)
+### P0 - MVP (Must Have) ✅ COMPLETE
 
-1. **CSV Data Loading**
+1. **CSV Data Loading** ✅
    - Load CSV from OneDrive path (same folder as index.html)
    - Parse using PapaParse
    - Handle date parsing (multiple formats)
    - Validate required fields, surface errors gracefully
 
-2. **Gantt Chart Rendering**
-   - Render tasks as horizontal bars on timeline
+2. **Swimlane Gantt Chart Rendering** ✅
+   - Render tasks as horizontal bars in swimlanes grouped by epic/team
    - Color-code by status:
-     - Complete: Green `#22c55e`
-     - In Progress: Blue `#3b82f6`
-     - Blocked: Red `#ef4444`
-     - Not Started: Gray `#9ca3af`
-   - Show today marker (vertical line)
-   - Support zoom levels: Day, Week, Month, Quarter
+     - Complete: Emerald `bg-emerald-500`
+     - In Progress: Blue `bg-blue-500`
+     - Blocked: Red `bg-red-500`
+     - Not Started: Gray `bg-gray-400`
+   - Show today marker (vertical orange line)
+   - Quarterly grid overlay (Q1, Q2, Q3, Q4)
+   - Impact indicators (ring highlights)
 
-3. **Hierarchy Display**
-   - 3-level hierarchy: Initiative → Epic → Task
-   - Collapse/expand on click
-   - Progress rolls up from children to parents
+3. **Modern Layout** ✅
+   - Sidebar navigation with icon buttons
+   - Header with search and user avatars
+   - View toggle (Items, Milestones, Timeline)
+   - Action toolbar
 
-4. **Filtering**
-   - Quarter filter: Q1/Q2/Q3/Q4
-   - Epic filter: Dropdown of all Level 2 items
-   - Status filter: Complete, In Progress, Blocked, Not Started
-   - Impact filter: High, Medium, Low
+4. **Search/Filtering** ✅
+   - Real-time search across task titles
+   - View mode switching
 
-5. **Summary Cards**
-   - Count by status: Complete | In Progress | Blocked | Not Started
-   - Update dynamically when filters change
+5. **Task Management** ✅
+   - Click task to open detail modal
+   - Edit status, impact, notes
+   - View and add comments
+   - Sub-item tracking
 
 ### P1 - Polish (Should Have)
 
-6. **Dependency Arrows**
+6. **Dependency Arrows** ⏳
    - Draw connector lines between dependent tasks
    - Gray color, 2px stroke
 
-7. **Task Detail Tooltip**
-   - On hover/click show: Title, Owner, Status, Dates, Notes
-   - Positioned near cursor
+7. **Task Detail Modal** ✅
+   - Full modal with: Title, Owner, Status, Dates, Notes
+   - Editable fields
+   - Comments section
 
-8. **Export to PNG**
+8. **Export to PNG** ✅
    - Button to capture current Gantt view as image
    - Filename: `roadmap_YYYY-MM-DD.png`
 
-9. **Last Updated Timestamp**
+9. **Last Updated Timestamp** ✅
    - Show when CSV file was last modified
 
 ---
@@ -121,53 +128,65 @@ The CSV file is the single source of truth with these columns:
 
 ```
 src/
-├── main.jsx              # Entry point
-├── App.jsx               # Main app shell
+├── main.tsx                    # Entry point
+├── App.tsx                     # Main app shell
+├── index.css                   # Global styles
+├── vite-env.d.ts              # TypeScript declarations
 ├── components/
-│   ├── FilterBar.jsx     # Filters and controls
-│   ├── GanttChart.jsx    # Gantt visualization
-│   ├── SummaryCards.jsx  # Status counts
-│   ├── TaskDetail.jsx    # Tooltip/modal
-│   └── ErrorState.jsx    # Error display
-├── hooks/
-│   └── useRoadmapData.js # Data loading hook
-├── utils/
-│   ├── csvParser.js      # CSV loading/parsing
-│   ├── dataTransforms.js # Data manipulation
-│   └── ganttHelpers.js   # Gantt utilities
-└── styles/
-    └── gantt-overrides.css # Custom Gantt styles
+│   ├── Layout.tsx             # App shell (Sidebar + Header + Main)
+│   ├── Header.tsx             # Top navigation bar
+│   ├── Sidebar.tsx            # Icon navigation sidebar
+│   ├── RoadmapDashboard.tsx   # Main dashboard with toolbar
+│   ├── GanttChart.tsx         # Swimlane Gantt visualization
+│   ├── TaskModal.tsx          # Task detail/edit modal
+│   ├── NewItemModal.tsx       # Create new item modal
+│   ├── CommentsView.tsx       # Comments overlay
+│   ├── ui/
+│   │   ├── button.tsx         # Button component
+│   │   ├── scroll-area.tsx    # Scroll area component
+│   │   └── utils.ts           # cn() utility
+│   └── figma/
+│       └── ImageWithFallback.tsx
+├── lib/
+│   ├── data.ts                # Type definitions (Swimlane, RoadmapItem, etc.)
+│   ├── csvParser.ts           # CSV loading/parsing
+│   ├── csvToSwimlane.ts       # CSV to Swimlane transformation
+│   └── utils.ts               # Utility functions
+└── hooks/
+    └── useRoadmapData.ts      # Data loading hook
 ```
 
 ---
 
 ## Development Plan
 
-### Phase 1: Data Layer ✅ (Current)
+### Phase 1: Data Layer ✅
 - [x] Project setup
-- [ ] CSV parser
-- [ ] Data transforms
-- [ ] useRoadmapData hook
+- [x] CSV parser (TypeScript)
+- [x] Data transforms (csvToSwimlane)
+- [x] useRoadmapData hook
 
-### Phase 2: Core UI
-- [ ] App.jsx shell
-- [ ] GanttChart component
-- [ ] Zoom controls
-- [ ] Status colors
+### Phase 2: Core UI ✅
+- [x] App.tsx shell with Layout
+- [x] Sidebar + Header components
+- [x] GanttChart swimlane component
+- [x] Status colors
+- [x] Today marker
 
-### Phase 3: Filtering
-- [ ] FilterBar component
-- [ ] All 4 filters
-- [ ] Filter state management
+### Phase 3: Task Management ✅
+- [x] TaskModal component
+- [x] NewItemModal component
+- [x] CommentsView component
+- [x] Edit functionality
 
-### Phase 4: Polish
-- [ ] SummaryCards
-- [ ] TaskDetail tooltip
-- [ ] Dependency arrows
-- [ ] PNG export
+### Phase 4: Polish ✅
+- [x] View toggle (Items/Milestones/Timeline)
+- [x] Search functionality
+- [x] PNG export
+- [x] Toast notifications
 
-### Phase 5: Deploy
-- [ ] Build for production
+### Phase 5: Deploy ⏳
+- [x] Build for production
 - [ ] Copy to OneDrive folder
 - [ ] Test from OneDrive location
 
@@ -175,15 +194,29 @@ src/
 
 ## Definition of Done
 
-- [ ] Dashboard loads CSV in <3 seconds
-- [ ] All 4 filters work correctly
-- [ ] Gantt displays 3-level hierarchy with collapse/expand
-- [ ] Status colors match spec
-- [ ] Today marker visible
-- [ ] Summary cards update with filters
-- [ ] Export to PNG works
-- [ ] No console errors
+- [x] Dashboard loads CSV in <3 seconds
+- [x] Search filters work correctly
+- [x] Gantt displays swimlane view grouped by epic
+- [x] Status colors match spec
+- [x] Today marker visible
+- [x] Task modal with editing
+- [x] Export to PNG works
+- [x] No console errors
 - [ ] Deployed to OneDrive and accessible
+
+---
+
+## Design Reference
+
+**Figma Make Design:** The UI follows the Figma Make export from:
+`https://www.figma.com/make/egNk95xzinMXyiMrI2oUc2/Create-Product-Roadmap-Dashboard`
+
+Key design elements:
+- Compact sidebar (64px) with icon navigation
+- Header with search and avatar group
+- Card-based main content area
+- Swimlane Gantt with color-coded team lanes
+- Modal dialogs for task details
 
 ---
 
@@ -193,3 +226,4 @@ src/
 - No backend server needed - pure client-side
 - File access works because both files are in same directory
 - Users can edit CSV directly in Excel, refresh browser to see updates
+- TypeScript provides type safety and better developer experience
