@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { RoadmapDashboard } from '@/components/RoadmapDashboard';
 import { useRoadmapData } from '@/hooks/useRoadmapData';
 import { Toaster, toast } from 'sonner';
+import logger from '@/lib/logger';
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  // Use Vite's base URL for correct path in both dev and production
-  const csvPath = `${import.meta.env.BASE_URL}sample-roadmap-data.csv`;
-  const { data, loading, error, lastModified, reload, setData } = useRoadmapData(csvPath);
+  const { data, loading, error, lastModified, reload, setData, isDemo } = useRoadmapData();
 
   // Handle export
   const handleExport = async () => {
@@ -48,7 +47,7 @@ export default function App() {
         toast.success('Exported successfully!');
       });
     } catch (err: any) {
-      console.error('Export error:', err);
+      logger.error('Export error:', err);
       toast.error('Failed to export: ' + err.message);
     }
   };
@@ -65,26 +64,7 @@ export default function App() {
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Error Loading Data</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={reload}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // No data state
+  // No data state (shouldn't happen with demo fallback, but just in case)
   if (!data || data.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -112,8 +92,29 @@ export default function App() {
         onNewItem={() => {}}
       >
         <div className="h-full flex flex-col">
+          {/* Demo mode banner */}
+          {isDemo && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-600 text-lg">⚡</span>
+                <div>
+                  <p className="text-amber-800 font-medium text-sm">Demo Mode</p>
+                  <p className="text-amber-700 text-xs">
+                    {error ? error : 'Showing sample data. Connect your CSV to see real roadmap data.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={reload}
+                className="px-3 py-1.5 bg-amber-100 text-amber-800 rounded hover:bg-amber-200 transition-colors text-sm font-medium"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
           {/* Info bar */}
-          {lastModified && (
+          {lastModified && !isDemo && (
             <div className="text-xs text-gray-500 mb-2 flex items-center justify-between">
               <span>
                 Last updated: {lastModified.toLocaleString('en-US', {

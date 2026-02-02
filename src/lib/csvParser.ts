@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import logger from './logger';
 
 export interface CSVRow {
   id: string;
@@ -40,7 +41,7 @@ export async function loadCSV(filePath: string): Promise<ParseResult> {
 
     return parseCSV(csvText, lastModified);
   } catch (error) {
-    console.error('Error loading CSV:', error);
+    logger.error('Error loading CSV:', error);
     throw error;
   }
 }
@@ -57,7 +58,7 @@ export function parseCSV(csvText: string, lastModified: Date = new Date()): Pars
   });
 
   if (parseResult.errors.length > 0) {
-    console.warn('CSV parsing errors:', parseResult.errors);
+    logger.warn('CSV parsing errors:', parseResult.errors);
   }
 
   const { data: transformedData, errors: validationErrors } = transformRows(parseResult.data as any[]);
@@ -129,7 +130,7 @@ export function parseDate(dateStr: string): Date | null {
     }
   }
 
-  console.warn(`Could not parse date: ${dateStr}`);
+  logger.warn(`Could not parse date: ${dateStr}`);
   return null;
 }
 

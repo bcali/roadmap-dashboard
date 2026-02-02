@@ -2,6 +2,30 @@
 
 All notable changes to the Roadmap Dashboard project.
 
+## [2.2.0] - 2026-02-02
+
+### 🛡️ Stability & Rollout Improvements
+
+Production-ready improvements for easier deployment and better user experience.
+
+#### Added
+- **Demo Mode Fallback** - Shows sample data when CSV fails to load, so users always see a working dashboard
+- **Environment Variable Support** - Configure custom CSV URL via `VITE_CSV_URL` environment variable
+- **SETUP.md Guide** - Quick setup guide for new deployments
+- **Development Logger** - Console logs only appear in development, keeping production clean
+
+#### Changed
+- **Better Error Messages** - User-friendly error descriptions for common issues (network, CORS, 404, parse errors)
+- **Improved Error Handling** - Graceful fallback instead of blank error screens
+
+#### New Files
+- `src/lib/logger.ts` - Development-only logging utility
+- `src/lib/demoData.ts` - Fallback demo data for when CSV is unavailable
+- `.env.example` - Example environment configuration
+- `SETUP.md` - Quick setup and deployment guide
+
+---
+
 ## [2.1.0] - 2026-01-30
 
 ### 🚀 GitHub Pages Deployment
