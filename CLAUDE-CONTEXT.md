@@ -1,103 +1,95 @@
 # Claude Code Session Context
 
-**Last Updated:** 2026-01-29
+**Last Updated:** 2026-02-13
 
-## What We Were Doing
+## Project Overview
 
-Attempting to pull design from Figma Make to continue developing the roadmap dashboard.
-
-**Figma URL:** https://www.figma.com/make/egNk95xzinMXyiMrI2oUc2/Create-Product-Roadmap-Dashboard?t=hw0ubsIjhPfQckSb-1
+AI-powered roadmap management system for Minor Hotels' payments modernization program. Combines a React swimlane Gantt dashboard with a Claude-driven weekly analysis pipeline.
 
 **GitHub Repo:** https://github.com/bcali/roadmap-dashboard
+**Live Dashboard:** https://bcali.github.io/roadmap-dashboard/
+**Local Path:** `D:\Users\bclark\roadmap-dashboard`
 
-## Blocker (Resolved?)
+## Current State
 
-- **Figma MCP server configured** - User says it's ready
-- **Need to restart Claude session** to pick up the Figma MCP tool
-- After restart, use Figma MCP tool to fetch design from:
-  `https://www.figma.com/make/egNk95xzinMXyiMrI2oUc2/Create-Product-Roadmap-Dashboard`
+### What's Built
 
-## Current Project State
+**Frontend (React 19 + TypeScript + Vite 7 + Tailwind CSS 4):**
+- Swimlane Gantt chart with 47 items across 3 initiatives (PAY, LOY, ANA)
+- KPI cards (payment success rate, avg cost/txn, % hotels on stack)
+- AI Recommendations slide-out panel (parses recommendations/latest.md)
+- Analysis Indicator badge in header (shows last AI run date)
+- WorkstreamLink in task modals (links to workstream .md on GitHub)
+- Task management (edit status, notes, comments, sub-items)
+- Search, PNG export, demo mode fallback
 
-### Location
-- **Local path:** `D:\Users\bclark\roadmap-dashboard` (NOT in OneDrive - no sync conflicts)
-- **Git:** Up-to-date with `origin/main`
-- **Local changes:** package.json, package-lock.json, vite.config.js modified but not committed
+**AI Pipeline (scripts/ — Node.js + tsx):**
+- `analyze.ts` — orchestrates weekly Claude Opus 4.6 analysis with extended thinking
+- `generate-workstreams.ts` — initializes .md files from CSV (already run, 14 files)
+- `process-inputs.ts` — validates & indexes weekly input markdown
+- `apply-recommendations.ts` — applies approved recs to CSV + JSON
+- `update-kpis.ts` — extracts KPI data from status updates
 
-### Tech Stack
-- React 19 + Vite 7
-- Tailwind CSS 4
-- frappe-gantt (Gantt chart library)
-- PapaParse (CSV parsing)
-- html2canvas (PNG export)
+**Infrastructure:**
+- `data/` — enriched JSON (roadmap.json, kpis.json, analysis-history.json, input-index.json)
+- `workstreams/` — active .md files per initiative and epic
+- `inputs/templates/` — structured markdown templates for weekly inputs
+- `prompts/` — prompts for generating input data from Outlook, Teams, Confluence
+- `.github/workflows/` — deploy.yml, ai-analyze.yml (weekly cron), process-inputs.yml
 
-### Implemented Components
-All components exist in `src/components/`:
-- `FilterBar.jsx` - Quarter, epic, effort, impact, status filters
-- `GanttChart.jsx` - Gantt visualization using frappe-gantt
-- `SummaryCards.jsx` - Status count cards
-- `TaskDetail.jsx` - Task detail tooltip/modal
-- `ErrorState.jsx` - Error display
+### What's NOT Done Yet
 
-### Utilities
-- `src/hooks/useRoadmapData.js` - Data loading hook
-- `src/utils/csvParser.js` - CSV parsing
-- `src/utils/dataTransforms.js` - Data filtering/transformation
+- **ANTHROPIC_API_KEY** not yet added to GitHub repo secrets (needed for AI analysis)
+- **No real weekly inputs** yet — templates exist but no data has been ingested
+- **Phase 5** not started: expandable hierarchy in Gantt, trend sparklines, operational runbook, tests
+- **Dependency arrows** not yet implemented in Gantt chart
+- **Prompt library** — `add_roadmap_prompts.py` pushed to bcali/prompt-library but needs local execution
 
-### What's Working (per PRD)
-- [x] Project setup
-- [x] Component structure
-- [x] Basic Gantt chart rendering
-- [x] Filter bar UI
-- [x] Summary cards
-- [x] Export to PNG functionality
-- [x] Task detail popup
+## Tech Stack
 
-### What May Need Work
-- [ ] Test with actual CSV data
-- [ ] Verify all filters work correctly
-- [ ] Style refinements from Figma design
-- [ ] Dependency arrows between tasks
-- [ ] Today marker visibility
-- [ ] Deploy to OneDrive folder
+| Layer | Tech |
+|-------|------|
+| Frontend | React 19, TypeScript 5.8, Vite 7, Tailwind CSS 4 |
+| UI | Radix UI, Lucide icons, Sonner toasts, html2canvas |
+| Data | PapaParse (CSV), custom JSON schemas |
+| AI | @anthropic-ai/sdk, Claude Opus 4.6, extended thinking |
+| Scripts | tsx (zero-build TS execution) |
+| CI/CD | GitHub Actions, GitHub Pages |
 
-## Next Steps
+## Key Design Decisions
 
-1. **Get Figma access working** - Either:
-   - Configure Figma MCP server properly
-   - Export design specs from Figma manually
-   - Run the app and compare visually with Figma
+1. **CSV stays as frontend source** — dashboard reads CSV directly. JSON is the enriched data layer for AI.
+2. **Recommend only** — AI never writes to CSV. Generates recommendation .md files. User checks `[x] Approved` boxes, then runs apply script.
+3. **Markdown as interface** — all inputs, outputs, and workstream notes are markdown files. Human-readable, git-trackable.
+4. **Cost-conscious** — ~$2.40/weekly run (~$12/month). Extended thinking budget configurable.
+5. **No backend** — pure frontend + GitHub Actions + Claude API. No server to maintain.
 
-2. **Run the dev server** to see current state:
-   ```bash
-   cd D:\Users\bclark\roadmap-dashboard
-   npm run dev
-   ```
-
-3. **Test with sample data** - CSV should be at:
-   `D:\Users\bclark\OneDrive - Minor International PCL\All Things Payments\Payment Dashboard\sample-roadmap-data.csv`
-
-## Commands Reference
+## NPM Scripts
 
 ```bash
-# Navigate to project
-cd "D:\Users\bclark\roadmap-dashboard"
-
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev                    # Vite dev server
+npm run build                  # Production build
+npm run generate-workstreams   # Init .md files from CSV
+npm run analyze                # Run AI analysis
+npm run analyze:dry            # Dry run (no API)
+npm run process-inputs         # Validate + index inputs
+npm run apply-recommendations  # Apply approved recs
+npm run update-kpis            # Update KPI data
 ```
 
-## Files to Review
+## File Quick Reference
 
-- [PRD.md](PRD.md) - Full product requirements
-- [src/App.jsx](src/App.jsx) - Main app shell
-- [src/components/GanttChart.jsx](src/components/GanttChart.jsx) - Gantt implementation
+| What | Where |
+|------|-------|
+| CSV data | `public/sample-roadmap-data.csv` |
+| Frontend types | `src/lib/data.ts` |
+| KPI cards | `src/components/KpiCards.tsx` |
+| Recommendations panel | `src/components/RecommendationsPanel.tsx` |
+| Analysis indicator | `src/components/AnalysisIndicator.tsx` |
+| AI analysis script | `scripts/analyze.ts` |
+| Prompt engineering | `scripts/lib/prompts.ts` |
+| Claude API wrapper | `scripts/lib/anthropic.ts` |
+| Shared types (scripts) | `scripts/lib/types.ts` |
+| Input templates | `inputs/templates/` |
+| Workstream files | `workstreams/` |
+| KPI data | `data/kpis.json` |

@@ -4,6 +4,7 @@ import { GanttChart } from './GanttChart';
 import { Swimlane, RoadmapItem } from '@/lib/data';
 import { TaskModal } from './TaskModal';
 import { NewItemModal } from './NewItemModal';
+import { KpiCards } from './KpiCards';
 import { toast } from 'sonner';
 
 interface RoadmapDashboardProps {
@@ -59,7 +60,10 @@ export function RoadmapDashboard({ searchQuery = '', data, onDataChange, onExpor
   const shownItems = filteredData.reduce((acc, lane) => acc + lane.items.length, 0);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="flex flex-col h-full">
+      <KpiCards />
+
+      <div className="flex flex-col flex-1 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
@@ -151,6 +155,7 @@ export function RoadmapDashboard({ searchQuery = '', data, onDataChange, onExpor
             lanes={data}
           />
       )}
+      </div>
     </div>
   );
 }

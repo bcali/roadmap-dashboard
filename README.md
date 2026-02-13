@@ -1,84 +1,223 @@
 # Payment Roadmap Dashboard
 
-Interactive swimlane Gantt chart visualization for the payments modernization roadmap. Built with React 19, TypeScript, Vite, and Tailwind CSS.
+AI-powered roadmap management system for the payments modernization program. Built with React 19, TypeScript, Vite 7, and Tailwind CSS 4, with a Claude-driven analysis pipeline that ingests weekly inputs and generates actionable recommendations.
 
-**Live Demo:** https://bcali.github.io/roadmap-dashboard/
+**Live Dashboard:** https://bcali.github.io/roadmap-dashboard/
 
-![Dashboard Preview](docs/preview.png)
+## What It Does
 
-## Features
+This system goes beyond a static Gantt chart. It combines visual roadmap tracking with an AI analysis pipeline that:
 
-- **Swimlane Gantt Chart** - Tasks organized by team/epic with color-coded status bars
-- **Real-time Search** - Filter tasks instantly by title
-- **Task Management** - Click any task to view/edit details, status, notes, and comments
-- **Today Marker** - Visual indicator of current date on timeline
-- **Impact Indicators** - Ring highlights show task priority (High/Medium/Low)
-- **Export to PNG** - Download roadmap snapshot for presentations
-- **CSV-Powered** - Edit roadmap in Excel, push to GitHub to update
+- **Visualizes** 47 roadmap items across 3 initiatives in an interactive swimlane Gantt chart
+- **Tracks KPIs** — payment success rate (target: >=75%), avg cost per transaction, % hotels on payment stack
+- **Ingests weekly inputs** — structured markdown templates for emails, meetings, and status updates
+- **Analyzes with AI** — Claude Opus 4.6 reviews inputs against the roadmap and generates change recommendations
+- **Maintains workstream notes** — active `.md` files per initiative, epic, and task that accumulate context over time
+- **Recommends, doesn't act** — all AI suggestions require human approval before applying to the roadmap
+
+## Architecture
+
+```
+Weekly Inputs (markdown templates)
+  --> Push to main
+  --> GitHub Actions: process-inputs.yml validates & indexes
+  --> GitHub Actions: ai-analyze.yml (weekly cron Monday 9AM UTC)
+      --> Claude Opus 4.6 analyzes inputs + roadmap + history
+      --> Generates recommendations/YYYY-WXX.md
+      --> Updates workstreams/*.md with observations
+  --> User reviews recommendations, checks [x] Approved boxes
+  --> User runs apply script --> CSV + JSON updated
+  --> deploy.yml auto-deploys updated dashboard
+```
+
+## Dashboard Features
+
+- **Swimlane Gantt Chart** — tasks organized by epic with color-coded status bars
+- **KPI Cards** — 3 key metrics with target thresholds, trend indicators, and status colors
+- **AI Recommendations Panel** — slide-out sidebar listing latest AI-generated recommendations
+- **Analysis Indicator** — header badge showing last AI analysis date with recency coloring
+- **Workstream Links** — click through from any task to its workstream notes on GitHub
+- **Real-time Search** — filter tasks instantly by title
+- **Task Management** — click any task to view/edit details, status, notes, and comments
+- **Export to PNG** — download roadmap snapshot for presentations
 
 ## Quick Start
 
 ### View the Dashboard
 
-Just visit: **https://bcali.github.io/roadmap-dashboard/**
+Visit: **https://bcali.github.io/roadmap-dashboard/**
 
-Works on Mac, PC, and mobile - no installation needed!
+Works on Mac, PC, and mobile — no installation needed.
 
 ### Local Development
 
 ```bash
-# Clone the repo
 git clone https://github.com/bcali/roadmap-dashboard.git
 cd roadmap-dashboard
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
-
 # Open http://localhost:5173
 ```
 
-## Deployment
+### Enable AI Analysis
 
-The dashboard is automatically deployed to GitHub Pages when you push to `main`.
+1. Add `ANTHROPIC_API_KEY` to your GitHub repo secrets
+2. The `ai-analyze` workflow runs weekly (Monday 9AM UTC) or can be triggered manually
+3. Estimated cost: ~$2.40/weekly run (~$12/month)
 
-### How It Works
+## Weekly Workflow
 
-1. Push changes to `main` branch
-2. GitHub Actions builds the project
-3. Deploys to https://bcali.github.io/roadmap-dashboard/
-4. Takes ~2 minutes
+### 1. Prepare Inputs
 
-### First-Time Setup
+Fill in the structured markdown templates each week:
 
-If GitHub Pages isn't enabled yet:
+| Template | Source | Purpose |
+|----------|--------|---------|
+| `inputs/weekly/YYYY-WXX/emails.md` | Outlook Copilot summary | Key decisions and action items from email |
+| `inputs/weekly/YYYY-WXX/meetings.md` | Teams transcript | Meeting decisions, blockers, commitments |
+| `inputs/weekly/YYYY-WXX/status.md` | Confluence / manual | KPI data points, per-initiative status |
+| `inputs/weekly/YYYY-WXX/notes.md` | Manual observations | Risks, context, anything the AI should know |
 
-1. Go to **https://github.com/bcali/roadmap-dashboard/settings/pages**
-2. Under "Build and deployment" → Source: Select **"GitHub Actions"**
-3. Done! The workflow will deploy automatically on next push.
+Templates are in `inputs/templates/`. Prompts for generating input data from Outlook, Teams, and Confluence are in `prompts/`.
 
-## Updating the Roadmap Data
+### 2. Push to Main
 
-### Option 1: Edit in GitHub (Easiest)
+```bash
+git add inputs/weekly/2026-W07/
+git commit -m "Add weekly inputs for W07"
+git push
+```
 
-1. Go to https://github.com/bcali/roadmap-dashboard/blob/main/public/sample-roadmap-data.csv
-2. Click the pencil icon (Edit)
-3. Make changes
-4. Click "Commit changes"
-5. Wait ~2 minutes for deployment
+The `process-inputs` workflow automatically validates and indexes new inputs.
 
-### Option 2: Edit Locally
+### 3. AI Analysis Runs
 
-1. Edit `public/sample-roadmap-data.csv` in Excel or any text editor
-2. Commit and push:
-   ```bash
-   git add public/sample-roadmap-data.csv
-   git commit -m "Update roadmap data"
-   git push
-   ```
-3. Wait ~2 minutes for deployment
+Every Monday (or manually via workflow dispatch), Claude analyzes:
+- Current roadmap state (CSV + enriched JSON)
+- All weekly inputs since last analysis
+- Baseline documents (PRDs, strategy docs)
+- Workstream history and prior recommendations
+- KPI trends
+
+Output: `recommendations/latest.md` with structured recommendations.
+
+### 4. Review & Apply
+
+Open `recommendations/latest.md`, check the `[x] Approved` boxes for recommendations you accept, then:
+
+```bash
+npm run apply-recommendations
+```
+
+This updates both the CSV and enriched JSON atomically.
+
+## Project Structure
+
+```
+roadmap-dashboard/
+├── .github/workflows/
+│   ├── deploy.yml              # GitHub Pages deployment
+│   ├── ai-analyze.yml          # Weekly AI analysis (cron + manual)
+│   └── process-inputs.yml      # Input validation on push
+├── public/
+│   ├── sample-roadmap-data.csv # Roadmap data (source of truth for viz)
+│   ├── data/                   # Frontend-accessible JSON data
+│   └── recommendations/        # Latest recommendations for panel
+├── src/
+│   ├── components/
+│   │   ├── Layout.tsx          # App shell (Sidebar + Header + RecsPanel)
+│   │   ├── Header.tsx          # Top nav + AnalysisIndicator
+│   │   ├── Sidebar.tsx         # Icon sidebar + AI Recommendations button
+│   │   ├── RoadmapDashboard.tsx # KPI cards + toolbar + Gantt
+│   │   ├── GanttChart.tsx      # Swimlane chart
+│   │   ├── TaskModal.tsx       # Task details + WorkstreamLink
+│   │   ├── KpiCards.tsx        # 3-column KPI metric cards
+│   │   ├── RecommendationsPanel.tsx # Slide-out AI recommendations
+│   │   ├── AnalysisIndicator.tsx    # Header analysis badge
+│   │   ├── WorkstreamLink.tsx  # Link to workstream .md on GitHub
+│   │   └── ...                 # Other UI components
+│   ├── lib/
+│   │   ├── data.ts             # Type definitions (KPIs, Recommendations, etc.)
+│   │   ├── csvParser.ts        # CSV loading/parsing
+│   │   └── csvToSwimlane.ts    # Data transformation
+│   ├── hooks/
+│   │   ├── useRoadmapData.ts   # Roadmap data hook
+│   │   ├── useKpiData.ts       # KPI data hook
+│   │   └── useAnalysisHistory.ts # Analysis history hook
+│   ├── App.tsx                 # Root component
+│   └── main.tsx                # Entry point
+├── scripts/
+│   ├── lib/
+│   │   ├── types.ts            # Shared TypeScript interfaces
+│   │   ├── anthropic.ts        # Claude API wrapper (retry, cost tracking)
+│   │   ├── prompts.ts          # System + analysis prompt engineering
+│   │   ├── csv-io.ts           # CSV read/write for Node.js
+│   │   ├── json-io.ts          # Typed JSON data file operations
+│   │   └── markdown.ts         # Markdown generation for workstreams
+│   ├── analyze.ts              # Main AI analysis orchestrator
+│   ├── generate-workstreams.ts # Initialize .md files from CSV
+│   ├── process-inputs.ts       # Validate & index new inputs
+│   ├── apply-recommendations.ts # Apply approved changes to CSV + JSON
+│   └── update-kpis.ts          # Update KPI tracking data
+├── inputs/
+│   ├── templates/              # Fillable markdown templates
+│   ├── baseline/               # Long-lived reference docs
+│   └── weekly/YYYY-WXX/        # Weekly input files
+├── workstreams/
+│   ├── _overview.md            # Program-level KPI tracking
+│   ├── PAY-001/                # Payments initiative + epics
+│   ├── LOY-001/                # Loyalty initiative + epics
+│   └── ANA-001/                # Analytics initiative + epics
+├── recommendations/            # AI-generated recommendation files
+├── data/                       # Enriched JSON data (AI pipeline)
+├── prompts/                    # Input generation prompts
+├── PRD.md                      # Product requirements
+├── CHANGELOG.md                # Version history
+└── README.md                   # This file
+```
+
+## NPM Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Production build (TypeScript check + Vite) |
+| `npm run generate-workstreams` | Initialize workstream .md files from CSV |
+| `npm run analyze` | Run AI analysis (requires `ANTHROPIC_API_KEY`) |
+| `npm run analyze:dry` | Dry run analysis (no API calls) |
+| `npm run process-inputs` | Validate and index input files |
+| `npm run apply-recommendations` | Apply approved recommendations to CSV |
+| `npm run update-kpis` | Update KPI data from weekly status |
+
+## KPI Tracking
+
+| Metric | Target | Direction | Description |
+|--------|--------|-----------|-------------|
+| Payment Success Rate | >= 75% | Above | Transaction success rate across all properties |
+| Avg Cost per Transaction | Tracking | Below | Payment processing cost per transaction |
+| % Hotels on Payment Stack | Tracking | Above | Rollout coverage of new payment infrastructure |
+
+KPIs are displayed as color-coded cards at the top of the dashboard:
+- **Green** — meeting or exceeding target
+- **Amber** — within 10% of target
+- **Red** — below threshold
+
+## Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| React 19 | UI framework |
+| TypeScript 5.8 | Type safety |
+| Vite 7 | Build tool |
+| Tailwind CSS 4 | Styling |
+| Radix UI | Accessible components |
+| Lucide | Icons |
+| date-fns | Date handling |
+| PapaParse | CSV parsing |
+| Sonner | Toast notifications |
+| html2canvas | PNG export |
+| @anthropic-ai/sdk | Claude API (AI analysis) |
+| tsx | TypeScript script execution |
 
 ## CSV Data Format
 
@@ -99,7 +238,7 @@ The dashboard reads from `public/sample-roadmap-data.csv`:
 | dependency | No | Comma-separated task IDs | PAY-003, PAY-004 |
 | notes | No | Additional context | Blocked on credentials |
 
-### Hierarchy Structure
+### Hierarchy
 
 ```
 Level 1: Initiative (top-level grouping)
@@ -107,52 +246,24 @@ Level 1: Initiative (top-level grouping)
         └── Level 3: Task (displayed as bars in swimlane)
 ```
 
-## Tech Stack
+## Deployment
 
-| Technology | Purpose |
-|------------|---------|
-| React 19 | UI framework |
-| TypeScript | Type safety |
-| Vite 7 | Build tool |
-| Tailwind CSS 4 | Styling |
-| Radix UI | Accessible components |
-| Lucide | Icons |
-| date-fns | Date handling |
-| PapaParse | CSV parsing |
-| Sonner | Toast notifications |
-| html2canvas | PNG export |
+The dashboard auto-deploys to GitHub Pages on every push to `main`.
 
-## Project Structure
+### How It Works
 
-```
-roadmap-dashboard/
-├── .github/workflows/
-│   └── deploy.yml          # GitHub Pages deployment
-├── public/
-│   └── sample-roadmap-data.csv  # Roadmap data
-├── src/
-│   ├── components/
-│   │   ├── Layout.tsx      # App shell (Sidebar + Header)
-│   │   ├── Header.tsx      # Top navigation
-│   │   ├── Sidebar.tsx     # Icon sidebar
-│   │   ├── RoadmapDashboard.tsx  # Main view
-│   │   ├── GanttChart.tsx  # Swimlane chart
-│   │   ├── TaskModal.tsx   # Task details modal
-│   │   ├── NewItemModal.tsx # Create task modal
-│   │   ├── CommentsView.tsx # Comments panel
-│   │   └── ui/             # Reusable UI components
-│   ├── lib/
-│   │   ├── data.ts         # Type definitions
-│   │   ├── csvParser.ts    # CSV loading
-│   │   └── csvToSwimlane.ts # Data transformation
-│   ├── hooks/
-│   │   └── useRoadmapData.ts # Data hook
-│   ├── App.tsx             # Root component
-│   └── main.tsx            # Entry point
-├── PRD.md                  # Product requirements
-├── CHANGELOG.md            # Version history
-└── README.md               # This file
-```
+1. Push changes to `main` branch
+2. GitHub Actions builds the project
+3. Deploys to https://bcali.github.io/roadmap-dashboard/
+4. Takes ~2 minutes
+
+### First-Time Setup
+
+If GitHub Pages isn't enabled yet:
+
+1. Go to **https://github.com/bcali/roadmap-dashboard/settings/pages**
+2. Under "Build and deployment" → Source: Select **"GitHub Actions"**
+3. Add `ANTHROPIC_API_KEY` to repo secrets for AI analysis
 
 ## Troubleshooting
 
@@ -161,22 +272,15 @@ roadmap-dashboard/
 - Verify CSV format matches schema above
 - Make sure dates are valid
 
-### Deployment not working?
-- Check GitHub Actions tab for errors
-- Verify Pages is set to "GitHub Actions" source
-- Wait 2-3 minutes after push
+### AI analysis not running?
+- Verify `ANTHROPIC_API_KEY` is set in GitHub repo secrets
+- Check the Actions tab for workflow run logs
+- Try `npm run analyze:dry` locally to test without API calls
 
 ### Local dev issues?
 - Delete `node_modules` and run `npm install`
 - Check Node.js version (requires 18+)
 - Try `npm run build` to see TypeScript errors
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch
-3. Make changes
-4. Submit a PR
 
 ## License
 
@@ -185,4 +289,4 @@ MIT
 ---
 
 **Maintained by:** Brian Clark
-**Last Updated:** January 2026
+**Last Updated:** February 2026

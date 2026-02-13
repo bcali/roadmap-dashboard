@@ -6,10 +6,15 @@ import {
   Users,
   Bell,
   Zap,
-  HelpCircle
+  HelpCircle,
+  Lightbulb
 } from 'lucide-react';
 
-export function Sidebar() {
+interface SidebarProps {
+  onOpenRecommendations?: () => void;
+}
+
+export function Sidebar({ onOpenRecommendations }: SidebarProps) {
   return (
     <aside className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 space-y-6 z-10 shadow-sm">
       {/* Logo Placeholder */}
@@ -26,6 +31,13 @@ export function Sidebar() {
         </button>
         <button className="p-2 text-white bg-teal-400 rounded-full shadow-lg ring-4 ring-teal-50 transition-all" title="Dashboard">
           <Menu size={20} />
+        </button>
+        <button
+          className="p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+          title="AI Recommendations"
+          onClick={onOpenRecommendations}
+        >
+          <Lightbulb size={20} />
         </button>
 
         <div className="flex-1" />

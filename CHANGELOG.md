@@ -2,6 +2,72 @@
 
 All notable changes to the Roadmap Dashboard project.
 
+## [3.0.0] - 2026-02-13
+
+### AI-Powered Roadmap Management System
+
+Major evolution from a static visualization tool into an AI-driven roadmap management system with automated weekly analysis, KPI tracking, and structured input ingestion.
+
+#### Added - AI Analysis Pipeline
+- **Claude Opus 4.6 integration** with extended thinking for deep roadmap analysis
+- **Weekly analysis workflow** (`ai-analyze.yml`) — cron on Monday 9AM UTC + manual dispatch
+- **Input processing workflow** (`process-inputs.yml`) — validates and indexes weekly inputs on push
+- **Analysis orchestrator** (`scripts/analyze.ts`) — assembles context, calls Claude, writes recommendations
+- **Apply recommendations** (`scripts/apply-recommendations.ts`) — checkbox-based approval workflow
+- **KPI updater** (`scripts/update-kpis.ts`) — extracts metrics from weekly status updates
+
+#### Added - Workstream Tracking
+- **14 workstream .md files** auto-generated from CSV data
+- **Program overview** (`workstreams/_overview.md`) with KPI tracking
+- **Per-initiative** tracking (PAY-001, LOY-001, ANA-001)
+- **Per-epic** tracking with task tables, dependency info, and weekly log sections
+- **Workstream generator** (`scripts/generate-workstreams.ts`)
+
+#### Added - Structured Input System
+- **4 input templates** — emails, meetings, status updates, baseline PRDs
+- **4 generation prompts** — for Outlook Copilot, Teams transcripts, Confluence, and weekly aggregation
+- **Input index** (`data/input-index.json`) for tracking ingested inputs over time
+
+#### Added - Frontend Components
+- **KPI Cards** — 3-column metrics with targets, trend arrows, and status colors (green/amber/red)
+- **AI Recommendations Panel** — slide-out sidebar parsing `recommendations/latest.md`
+- **Analysis Indicator** — header badge with recency-colored dot showing last AI run date
+- **Workstream Links** — task modals link to their workstream .md on GitHub
+
+#### Added - Data Layer
+- **Enriched JSON** (`data/roadmap.json`) — superset of CSV with AI observations and risk levels
+- **KPI data** (`data/kpis.json`) — targets and historical snapshots
+- **Analysis history** (`data/analysis-history.json`) — index of past AI runs with cost tracking
+- **TypeScript interfaces** for all data models (`scripts/lib/types.ts`)
+
+#### Added - Scripts Infrastructure
+- `scripts/lib/anthropic.ts` — Claude API wrapper with retry, backoff, and cost estimation
+- `scripts/lib/prompts.ts` — system and analysis prompt engineering
+- `scripts/lib/csv-io.ts` — CSV read/write for Node.js (mirrors frontend parser)
+- `scripts/lib/json-io.ts` — typed JSON data file operations
+- `scripts/lib/markdown.ts` — markdown generation for workstreams and recommendations
+
+#### Changed
+- `src/lib/data.ts` — extended with KPI, Recommendation, and Analysis types
+- `src/components/RoadmapDashboard.tsx` — KPI cards rendered above toolbar
+- `src/components/Layout.tsx` — manages RecommendationsPanel state
+- `src/components/Sidebar.tsx` — added AI Recommendations button (Lightbulb icon)
+- `src/components/Header.tsx` — added AnalysisIndicator badge
+- `src/components/TaskModal.tsx` — added WorkstreamLink below task title
+- `package.json` — added `@anthropic-ai/sdk`, `tsx`, and 6 new npm scripts
+- `README.md` — comprehensive documentation of the full system
+- `CLAUDE-CONTEXT.md` — updated with current architecture
+
+#### New npm Scripts
+- `npm run generate-workstreams` — initialize .md files from CSV
+- `npm run analyze` — run AI analysis (requires ANTHROPIC_API_KEY)
+- `npm run analyze:dry` — dry run without API calls
+- `npm run process-inputs` — validate and index input files
+- `npm run apply-recommendations` — apply approved recommendations
+- `npm run update-kpis` — update KPI data from status updates
+
+---
+
 ## [2.2.0] - 2026-02-02
 
 ### 🛡️ Stability & Rollout Improvements

@@ -3,6 +3,7 @@ import { RoadmapItem, Comment } from '@/lib/data';
 import { X, Calendar, User, FileText, MessageSquare, CheckCircle, Circle } from 'lucide-react';
 import { format } from 'date-fns';
 import { CommentsView } from './CommentsView';
+import { WorkstreamLink } from './WorkstreamLink';
 
 interface TaskModalProps {
   item: RoadmapItem;
@@ -51,15 +52,20 @@ export function TaskModal({ item, isOpen, onClose, onSave }: TaskModalProps) {
 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50">
-           <div className="flex items-center space-x-3">
-               <div className={`h-4 w-4 rounded-full ${editedItem.status === 'Complete' ? 'bg-emerald-500' : editedItem.status === 'In Progress' ? 'bg-blue-500' : 'bg-gray-400'}`} />
-               <input
-                 className="text-xl font-bold bg-transparent border-none focus:ring-0 text-gray-900 w-full"
-                 value={editedItem.title}
-                 onChange={(e) => setEditedItem({...editedItem, title: e.target.value})}
-               />
+           <div className="flex-1 min-w-0">
+             <div className="flex items-center space-x-3">
+                 <div className={`h-4 w-4 rounded-full shrink-0 ${editedItem.status === 'Complete' ? 'bg-emerald-500' : editedItem.status === 'In Progress' ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                 <input
+                   className="text-xl font-bold bg-transparent border-none focus:ring-0 text-gray-900 w-full"
+                   value={editedItem.title}
+                   onChange={(e) => setEditedItem({...editedItem, title: e.target.value})}
+                 />
+             </div>
+             <div className="mt-1 ml-7">
+               <WorkstreamLink itemId={editedItem.id} />
+             </div>
            </div>
-           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200 transition-colors">
+           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200 transition-colors shrink-0">
              <X size={20} />
            </button>
         </div>

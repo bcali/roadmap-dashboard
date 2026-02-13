@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "targets": [
+    {
+      "key": "payment_success_rate",
+      "name": "Payment Success Rate",
+      "target": 75,
+      "unit": "%",
+      "direction": "above"
+    },
+    {
+      "key": "avg_cost_per_transaction",
+      "name": "Avg Cost per Transaction",
+      "target": null,
+      "unit": "$",
+      "direction": "below"
+    },
+    {
+      "key": "pct_hotels_on_stack",
+      "name": "% Hotels on Payment Stack",
+      "target": null,
+      "unit": "%",
+      "direction": "above"
+    }
+  ],
+  "history": []
+}
