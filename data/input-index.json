@@ -1,4 +1,12 @@
 {
   "version": "1.0",
-  "inputs": []
+  "inputs": [
+    {
+      "week": "baseline",
+      "file": "inputs/weekly-digest.md",
+      "type": "notes",
+      "indexed_at": "2026-02-13T13:47:42.535Z",
+      "size_bytes": 795
+    }
+  ]
 }

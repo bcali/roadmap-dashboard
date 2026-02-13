@@ -23,5 +23,25 @@
       "direction": "above"
     }
   ],
-  "history": []
+  "history": [
+    {
+      "week": "2026-W07",
+      "date": "2026-02-13",
+      "metrics": {
+        "payment_success_rate": null,
+        "avg_cost_per_transaction": null,
+        "pct_hotels_on_stack": null
+      },
+      "roadmap_metrics": {
+        "total_tasks": 34,
+        "completed": 6,
+        "in_progress": 10,
+        "blocked": 0,
+        "not_started": 18,
+        "completion_pct": 18,
+        "schedule_health": "at-risk"
+      },
+      "notes": ""
+    }
+  ]
 }
